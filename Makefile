@@ -903,6 +903,34 @@ src/haproxy.o:	src/haproxy.c $(DEP)
 	      -DBUILD_FEATURES='"$(strip $(BUILD_FEATURES))"' \
 	       -c -o $@ $<
 
+EXCLUDE_ERRORSHTML = type
+ERRORSHTML = $(filter-out $(EXCLUDE_ERRORSHTML),$(patsubst appendix/errors/%.http,%,$(wildcard appendix/errors/*.http)))
+
+install-appendix:
+	$(Q)install -v -m 644 appendix/haproxy.cfg "$(DESTDIR)$(PREFIX)"
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/run
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/errors
+	$(Q)for x in $(ERRORSHTML); do \
+		install -v -m 644 appendix/errors/$$x.http "$(DESTDIR)$(PREFIX)"/errors ; \
+	done
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/service
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/service/etc
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/service/etc/default
+	$(Q)install -v -m 644 appendix/service/etc/default/haproxy "$(DESTDIR)$(PREFIX)"/service/etc/default
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/service
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/service/lib
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/service/lib/systemd
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/service/lib/systemd/system
+	$(Q)install -v -m 644 appendix/service/lib/systemd/system/haproxy.service "$(DESTDIR)$(PREFIX)"/service/lib/systemd/system
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/example
+	$(Q)install -v -m 644 appendix/example/haproxy.cfg "$(DESTDIR)$(PREFIX)"/example
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/example/ssl/
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/example/ssl/certs
+	$(Q)install -v -m 644 appendix/example/ssl/certs/ca_example.chain.pem "$(DESTDIR)$(PREFIX)"/example/ssl/certs
+	$(Q)install -v -d "$(DESTDIR)$(PREFIX)"/example/ssl/private
+	$(Q)install -v -m 644 appendix/example/ssl/private/server_example.pem "$(DESTDIR)$(PREFIX)"/example/ssl/private
+	$(Q)install -v -m 644 appendix/example/ssl/private/server_example.pem.key "$(DESTDIR)$(PREFIX)"/example/ssl/private
+
 install-man:
 	$(Q)install -v -d "$(DESTDIR)$(MANDIR)"/man1
 	$(Q)install -v -m 644 doc/haproxy.1 "$(DESTDIR)$(MANDIR)"/man1
@@ -926,7 +954,14 @@ install-bin:
 	$(Q)install -v -d "$(DESTDIR)$(SBINDIR)"
 	$(Q)install -v haproxy $(EXTRA) "$(DESTDIR)$(SBINDIR)"
 
-install: install-bin install-man install-doc
+install: install-bin install-man install-doc install-appendix
+
+uninstall-appendix:
+	$(Q)rm -f "$(DESTDIR)$(PREFIX)"/haproxy.cfg
+	$(Q)rm -r "$(DESTDIR)$(PREFIX)"/run
+	$(Q)rm -r "$(DESTDIR)$(PREFIX)"/errors
+	$(Q)rm -r "$(DESTDIR)$(PREFIX)"/service
+	$(Q)rm -r "$(DESTDIR)$(PREFIX)"/example
 
 uninstall:
 	$(Q)rm -f "$(DESTDIR)$(MANDIR)"/man1/haproxy.1
@@ -935,6 +970,7 @@ uninstall:
 	done
 	$(Q)-rmdir "$(DESTDIR)$(DOCDIR)"
 	$(Q)rm -f "$(DESTDIR)$(SBINDIR)"/haproxy
+	uninstall-appendix
 
 clean:
 	$(Q)rm -f *.[oas] src/*.[oas] ebtree/*.[oas] haproxy test .build_opts .build_opts.new
