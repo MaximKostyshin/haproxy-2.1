@@ -11201,6 +11201,11 @@ static void __ssl_sock_init(void)
 
 	xprt_register(XPRT_SSL, &ssl_sock);
 #if HA_OPENSSL_VERSION_NUMBER < 0x10100000L
+        // Loading all engines for openssl version 1.1.1f 
+        // (the ssl-engine parameter for the global section of the haproxy.cfg file does not work)
+        OPENSSL_config(NULL);
+        OpenSSL_add_all_algorithms();
+
 	SSL_library_init();
 #endif
 #if (!defined(OPENSSL_NO_COMP) && !defined(SSL_OP_NO_COMPRESSION))
