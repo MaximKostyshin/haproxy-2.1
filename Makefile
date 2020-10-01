@@ -815,6 +815,7 @@ OBJS = src/mux_h2.o src/stream.o src/mux_fcgi.o src/cfgparse-listen.o         \
        src/http_rules.o src/http_fetch.o src/cache.o src/session.o            \
        src/fcgi-app.o src/connection.o src/tcp_rules.o src/filters.o          \
        src/task.o src/mworker.o src/map.o src/h1_htx.o src/trace.o            \
+       src/flt_placemark.o \
        src/flt_trace.o src/acl.o src/http_htx.o src/flt_http_comp.o           \
        src/payload.o src/vars.o src/debug.o src/mux_pt.o src/http_act.o       \
        src/h2.o src/queue.o src/fd.o src/proto_uxst.o src/lb_chash.o          \
